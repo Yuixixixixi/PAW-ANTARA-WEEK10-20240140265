@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS Bot Assistant - AI Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom Scrollbar Slate */
+    #chat-box::-webkit-scrollbar { width: 5px; }
+    #chat-box::-webkit-scrollbar-track { background: transparent; }
+    #chat-box::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    #chat-box::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Animasi Pop In */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.96) translateY(6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop { animation: popIn 0.2s ease-out forwards; }
+  </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-3 sm:p-4 font-sans antialiased text-slate-100">
+
+  <!-- Main Container Card (Masculine Dark Glassmorphism) -->
+  <div class="w-full max-w-2xl bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_10px_40px_-10px_rgba(14,165,233,0.15)] border border-slate-800 flex flex-col h-[85vh] max-h-[620px] overflow-hidden">
+    
+    <!-- Top Header -->
+    <div class="bg-slate-900/90 backdrop-blur-md px-5 py-3.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+      <div class="flex items-center gap-3">
+        <!-- Avatar Bot (Blue Gradient) -->
+        <div class="relative flex items-center justify-center">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-sky-500 to-cyan-400 p-[2px] shadow-lg shadow-sky-500/20">
+            <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-lg">
+              🤖
+            </div>
+          </div>
+          <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full animate-pulse"></span>
+        </div>
+
+        <!-- Judul Header -->
+        <div>
+          <h1 class="font-bold text-white text-base leading-tight tracking-wide flex items-center gap-2">
+            CS Bot Assistant
+            <span class="bg-sky-500/10 text-sky-400 border border-sky-500/30 text-[10px] font-semibold px-2 py-0.5 rounded-full">AI Support</span>
+          </h1>
+          <p class="text-[11px] text-slate-400 font-medium">Asisten pintar siap membantu 💬</p>
+        </div>
+      </div>
+
+      <!-- Tombol Muat Riwayat -->
+      <button onclick="loadHistory()" 
+        class="bg-slate-800/90 hover:bg-slate-700/80 text-sky-300 hover:text-sky-200 text-xs font-medium px-3 py-1.5 rounded-xl border border-sky-500/20 transition-all duration-200 flex items-center gap-1.5 shadow-sm active:scale-95">
+        <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Muat Riwayat</span>
+      </button>
+    </div>
+
+    <!-- Chat Messages Box -->
+    <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-950/40">
+      <div class="flex justify-start items-start gap-2.5 max-w-[85%] animate-pop">
+        <div class="w-8 h-8 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5 shadow-md shadow-sky-500/15">
+          🤖
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700/70 text-slate-100 px-4 py-2.5 rounded-2xl rounded-tl-xs text-sm leading-relaxed shadow-sm">
+          Halo! 👋 Ada yang bisa saya bantu terkait produk di toko hari ini? Silakan tanyakan.
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Input Area -->
+    <div class="p-3.5 sm:p-4 bg-slate-900 border-t border-slate-800/80 flex flex-col gap-2 shrink-0">
+      
+      <!-- Text Form -->
+      <form id="chat-form" class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <input type="text" id="message-input" placeholder="Ketik pertanyaan kamu di sini..." required autocomplete="off"
+            class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-sky-500/80 focus:ring-2 focus:ring-sky-500/20 transition-all text-slate-100 placeholder:text-slate-500">
+        </div>
+
+        <button type="submit" id="send-btn" 
+          class="h-11 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-semibold px-5 rounded-2xl text-sm transition-all duration-200 shadow-md shadow-sky-500/20 flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-50">
+          <span>Kirim</span>
+          <span class="text-xs">🚀</span>
+        </button>
+      </form>
+
+      <!-- Privacy Consent Toggle -->
+      <div class="flex items-center justify-between px-2 pt-1">
+        <label class="inline-flex items-center gap-2 cursor-pointer group">
+          <input type="checkbox" id="save-history-check" class="sr-only peer" checked>
+          <div class="w-7 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-sky-500 relative"></div>
+          <span class="text-[11px] text-slate-400 group-hover:text-slate-300 font-medium transition-colors">
+            🔒 Simpan riwayat obrolan ke database
+          </span>
+        </label>
+        <span class="text-[10px] text-slate-500">Powered by Gemini AI</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const sendBtn = document.getElementById('send-btn');
+
+    function appendMessage(text, sender) {
+      const wrapper = document.createElement('div');
+      wrapper.className = sender === 'user' 
+        ? 'flex justify-end animate-pop' 
+        : 'flex justify-start items-start gap-2.5 max-w-[85%] animate-pop';
+
+      if (sender === 'user') {
+        wrapper.innerHTML = `
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-xs text-sm leading-relaxed max-w-[85%] shadow-md">
+            ${escapeHtml(text)}
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <div class="w-8 h-8 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5 shadow-md shadow-sky-500/15">
+            🤖
+          </div>
+          <div class="bg-slate-800/90 border border-slate-700/70 text-slate-100 px-4 py-2.5 rounded-2xl rounded-tl-xs text-sm leading-relaxed shadow-sm">
+            ${escapeHtml(text)}
+          </div>
+        `;
+      }
+
+      chatBox.appendChild(wrapper);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const messageInput = document.getElementById('message-input');
+      const saveHistoryCheck = document.getElementById('save-history-check');
+
+      const message = messageInput.value.trim();
+      const saveHistory = saveHistoryCheck.checked;
+      if (!message) return;
+
+      appendMessage(message, 'user');
+      messageInput.value = '';
+      sendBtn.disabled = true;
+
+      const loadingId = 'loading-' + Date.now();
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = loadingId;
+      loadingDiv.className = 'flex justify-start items-start gap-2.5 max-w-[85%] animate-pop';
+      loadingDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">🤖</div>
+        <div class="bg-slate-800/90 border border-slate-700/70 text-sky-300 px-4 py-2.5 rounded-2xl rounded-tl-xs text-sm flex items-center gap-2">
+          <span class="animate-pulse">Bot sedang memproses jawaban... 💭</span>
+        </div>
+      `;
+      chatBox.appendChild(loadingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, saveHistory })
+        });
+
+        const result = await res.json();
+        document.getElementById(loadingId)?.remove();
+
+        if (res.ok && result.success !== false) {
+          appendMessage(result.data.reply, 'bot');
+        } else {
+          appendMessage(result.message || 'Maaf, permintaan belum bisa diproses saat ini.', 'bot');
+        }
+      } catch (err) {
+        document.getElementById(loadingId)?.remove();
+        appendMessage('Terjadi gangguan koneksi ke server.', 'bot');
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/chat/history');
+        const result = await res.json();
+
+        if (result.data && result.data.length > 0) {
+          chatBox.innerHTML = '';
+          result.data.forEach(item => {
+            appendMessage(item.userMessage, 'user');
+            appendMessage(item.botReply, 'bot');
+          });
+        } else {
+          alert('Belum ada riwayat percakapan.');
+        }
+      } catch (err) {
+        alert('Gagal mengambil riwayat dari server.');
+      }
+    }
+  </script>
+</body>
+</html>
